@@ -64,7 +64,7 @@ model user {
   client_id         String
   services          user_services[]
 
-  @@index([email, client_id])
+  @@unique([email, client_id])
 }
 
 model user_services {

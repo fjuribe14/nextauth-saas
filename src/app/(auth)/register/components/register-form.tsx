@@ -47,21 +47,16 @@ function RegisterForm({ clients }: { clients: Client[] }) {
   });
 
   async function onSubmit(values: z.infer<typeof registerUserFormSchema>) {
-    const res = await fetch(`/api/user`, {
+    const res = await fetch(`/api/auth/register`, {
       method: "POST",
       body: JSON.stringify(values),
     });
 
-    if (!res.ok) {
-      // This will activate the closest `error.js` Error Boundary
-      toast("Something went wrong!", {});
-      throw new Error("Failed to fetch data", {
-        cause: await res.json(),
-      });
-    }
+    toast(JSON.stringify(await res.json(), null, 2));
 
-    toast("Account created!");
-    router.push("/login");
+    if (!res.ok) return;
+
+    return router.push("/login");
   }
 
   return (
