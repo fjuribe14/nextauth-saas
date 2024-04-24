@@ -1,67 +1,58 @@
 "use client";
 
-import { z } from "zod";
 import {
-  Form,
-  FormControl,
   FormField,
   FormItem,
   FormLabel,
+  FormControl,
   FormMessage,
+  Form,
 } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@radix-ui/react-select";
 import TeamSwitcher from "@/components/team-switcher";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import { z } from "zod";
 import { Client } from "@/interfaces/client";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { Separator } from "@/components/ui/separator";
-import Link from "next/link";
 
-// const registerClientFormSchema = z.object({
-//   username: z.string().min(2).max(50),
-//   name: z.string({}),
-//   description: z.string({}),
-// });
-
-const registerUserFormSchema = z.object({
-  email: z.string().email(),
-  username: z.string().min(4),
-  password: z.string().min(8).max(50),
+const loginUserFormSchema = z.object({
   client: z.string(),
+  email: z.string().email(),
+  password: z.string().min(8).max(50),
 });
 
-function RegisterForm({ clients }: { clients: Client[] }) {
+export default function LoginForm({ clients }: { clients: Client[] }) {
   const router = useRouter();
-  const form = useForm<z.infer<typeof registerUserFormSchema>>({
-    resolver: zodResolver(registerUserFormSchema),
+  const form = useForm<z.infer<typeof loginUserFormSchema>>({
+    resolver: zodResolver(loginUserFormSchema),
     defaultValues: {
       client: "",
       email: "",
-      username: "",
       password: "",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof registerUserFormSchema>) {
-    const res = await fetch(`/api/user`, {
-      method: "POST",
-      body: JSON.stringify(values),
-    });
-
-    if (!res.ok) {
-      // This will activate the closest `error.js` Error Boundary
-      toast("Something went wrong!", {});
-      throw new Error("Failed to fetch data", {
-        cause: await res.json(),
+  async function onSubmit(values: z.infer<typeof loginUserFormSchema>) {
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify(values),
       });
-    }
 
-    toast("Account created!");
-    router.push("/auth/login");
+      if (!res.ok) {
+        toast("Something went wrong!");
+      }
+
+      router.push("/");
+    } catch (error) {
+      toast("Something went wrong!");
+    }
   }
 
   return (
@@ -94,21 +85,7 @@ function RegisterForm({ clients }: { clients: Client[] }) {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="shadcn@mai.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <FormControl>
-                    <Input placeholder="shadcn" {...field} />
+                    <Input placeholder="shadcn" {...field} type="email" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -135,7 +112,7 @@ function RegisterForm({ clients }: { clients: Client[] }) {
 
             <Button variant="link">Forgot password?</Button>
             <Button variant="link" asChild>
-              <Link href="/auth/login">Login</Link>
+              <Link href="/auth/register">Register</Link>
             </Button>
           </form>
         </Form>
@@ -143,5 +120,3 @@ function RegisterForm({ clients }: { clients: Client[] }) {
     </Card>
   );
 }
-
-export default RegisterForm;

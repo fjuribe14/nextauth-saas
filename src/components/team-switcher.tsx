@@ -1,5 +1,21 @@
-import { Calculator, Calendar, CreditCard, Settings, Smile, User } from "lucide-react";
+"use client";
 
+import * as React from "react";
+import { CaretSortIcon, CheckIcon, PlusCircledIcon } from "@radix-ui/react-icons";
+
+import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
+import { Button } from "./ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
   Command,
   CommandEmpty,
@@ -8,48 +24,171 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-  CommandShortcut,
-} from "@/components/ui/command";
+} from "./ui/command";
+import { Label } from "./ui/label";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./ui/select";
+import { Input } from "./ui/input";
+import { Client } from "@/interfaces/client";
 
-export default function CommandDemo() {
+export default function TeamSwitcher({
+  className,
+  field,
+  clients,
+}: {
+  className?: string;
+  field: any;
+  clients: Client[];
+}) {
+  const [open, setOpen] = React.useState(false);
+  const [showNewTeamDialog, setShowNewTeamDialog] = React.useState(false);
+  const [selectedTeam, setSelectedTeam] = React.useState<Client | null>(clients[0]);
+
   return (
-    <Command className="rounded-lg border shadow-md">
-      <CommandInput placeholder="Type a command or search..." />
-      <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
-        <CommandGroup heading="Suggestions">
-          <CommandItem>
-            <Calendar className="mr-2 h-4 w-4" />
-            <span>Calendar</span>
-          </CommandItem>
-          <CommandItem>
-            <Smile className="mr-2 h-4 w-4" />
-            <span>Search Emoji</span>
-          </CommandItem>
-          <CommandItem>
-            <Calculator className="mr-2 h-4 w-4" />
-            <span>Calculator</span>
-          </CommandItem>
-        </CommandGroup>
-        <CommandSeparator />
-        <CommandGroup heading="Settings">
-          <CommandItem>
-            <User className="mr-2 h-4 w-4" />
-            <span>Profile</span>
-            <CommandShortcut>⌘P</CommandShortcut>
-          </CommandItem>
-          <CommandItem>
-            <CreditCard className="mr-2 h-4 w-4" />
-            <span>Billing</span>
-            <CommandShortcut>⌘B</CommandShortcut>
-          </CommandItem>
-          <CommandItem>
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
-            <CommandShortcut>⌘S</CommandShortcut>
-          </CommandItem>
-        </CommandGroup>
-      </CommandList>
-    </Command>
+    <Dialog open={showNewTeamDialog} onOpenChange={setShowNewTeamDialog}>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            aria-label="Select a team"
+            className={cn("w-full justify-between", className)}>
+            <Avatar className="mr-2 h-5 w-5">
+              <AvatarImage
+                src={`https://avatar.vercel.sh/${selectedTeam?.id}.png`}
+                alt={selectedTeam?.id}
+                className="grayscale"
+              />
+              <AvatarFallback>SC</AvatarFallback>
+            </Avatar>
+            {field.value ? selectedTeam?.name : "Select a team"}
+            <CaretSortIcon className="ml-auto h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[200px] p-0">
+          <Command>
+            <CommandList>
+              <CommandInput placeholder="Search team..." />
+              <CommandEmpty>No team found.</CommandEmpty>
+
+              {clients.map((_) => (
+                <CommandItem
+                  key={_.id}
+                  value={`${_.id}`}
+                  onSelect={() => {
+                    field.onChange(_.id);
+                    setOpen(false);
+                  }}
+                  className="text-sm">
+                  <Avatar className="mr-2 h-5 w-5">
+                    <AvatarImage
+                      src={`https://avatar.vercel.sh/${_.id}.png`}
+                      alt={_.id}
+                      className="grayscale"
+                    />
+                    <AvatarFallback>
+                      {_.name?.split(" ")[0] ?? "T"}
+                      {_.name?.split(" ")[1] ?? "M"}
+                    </AvatarFallback>
+                  </Avatar>
+                  {_.name}
+                  <CheckIcon
+                    className={cn(
+                      "ml-auto h-4 w-4",
+                      field.value === _.id ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                </CommandItem>
+              ))}
+
+              {/* {groups.map((group) => (
+                <CommandGroup key={group.label} heading={group.label}>
+                  {group.teams.map((team) => (
+                    <CommandItem
+                      key={team.value}
+                      value={`${team.value}`}
+                      onSelect={() => {
+                        field.onChange(Number(team.value));
+                        setSelectedTeam(team);
+                        setOpen(false);
+                      }}
+                      className="text-sm">
+                      <Avatar className="mr-2 h-5 w-5">
+                        <AvatarImage
+                          src={`https://avatar.vercel.sh/${team.value}.png`}
+                          alt={team.label}
+                          className="grayscale"
+                        />
+                        <AvatarFallback>SC</AvatarFallback>
+                      </Avatar>
+                      {team.label}
+                      <CheckIcon
+                        className={cn(
+                          "ml-auto h-4 w-4",
+                          field.value === team.value ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              ))} */}
+            </CommandList>
+            <CommandSeparator />
+            <CommandList>
+              <CommandGroup>
+                <DialogTrigger asChild>
+                  <CommandItem
+                    onSelect={() => {
+                      setOpen(false);
+                      setShowNewTeamDialog(true);
+                    }}>
+                    <PlusCircledIcon className="mr-2 h-5 w-5" />
+                    Create Team
+                  </CommandItem>
+                </DialogTrigger>
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create team</DialogTitle>
+          <DialogDescription>Add a new team to manage products and customers.</DialogDescription>
+        </DialogHeader>
+        <div>
+          <div className="space-y-4 py-2 pb-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Team name</Label>
+              <Input id="name" placeholder="Acme Inc." />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="plan">Subscription plan</Label>
+              <Select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a plan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="free">
+                    <span className="font-medium">Free</span> -{" "}
+                    <span className="text-muted-foreground">Trial for two weeks</span>
+                  </SelectItem>
+                  <SelectItem value="pro">
+                    <span className="font-medium">Pro</span> -{" "}
+                    <span className="text-muted-foreground">$9/month per user</span>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setShowNewTeamDialog(false)}>
+            Cancel
+          </Button>
+          <Button type="submit">Continue</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
