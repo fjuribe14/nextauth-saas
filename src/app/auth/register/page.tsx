@@ -1,5 +1,9 @@
-function page() {
-  return <div>Enter</div>;
-}
+import RegisterForm from "./components/register-form";
 
-export default page;
+export default function page() {
+  return (
+    <div className="container flex min-h-screen flex-col items-center justify-center">
+      <RegisterForm />
+    </div>
+  );
+}
