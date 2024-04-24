@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model client {
+  id                     String             @id @default(uuid())
+  name                   String
+  description            String?
+  secret                 String?            @default(uuid())
+  session_multiple       Boolean            @default(true)
+  session_time_min       Int                @default(120)
+  user_active_on_created Boolean            @default(true)
+  created_at             DateTime           @default(now())
+  updated_at             DateTime           @updatedAt
+  services               clients_services[]
+  users                  user[]
+}
+
+model clients_services {
+  client     client   @relation(fields: [client_id], references: [id])
+  client_id  String
+  service    service  @relation(fields: [service_id], references: [id])
+  service_id String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@id([client_id, service_id])
+}
+
+model service {
+  id          String             @id @default(uuid())
+  name        String
+  description String?
+  created_at  DateTime           @default(now())
+  updated_at  DateTime           @updatedAt
+  clients     clients_services[]
+  users       user_services[]
+}
+
+model user {
+  id                String          @id @default(uuid())
+  first_name        String?
+  last_name         String?
+  dni               String?
+  email             String
+  email_verificated Boolean         @default(false)
+  active            Boolean         @default(false)
+  username          String
+  password          String
+  created_at        DateTime        @default(now())
+  updated_at        DateTime        @updatedAt
+  client            client          @relation(fields: [client_id], references: [id])
+  client_id         String
+  services          user_services[]
+
+  @@index([email, client_id])
+}
+
+model user_services {
+  user       user     @relation(fields: [user_id], references: [id])
+  user_id    String
+  service    service  @relation(fields: [service_id], references: [id])
+  service_id String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@id([user_id, service_id])
+}
+
+model password_requirement {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  value       String
+  regex       Boolean? @default(false)
+}
