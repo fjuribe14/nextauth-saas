@@ -46,12 +46,12 @@ export default function LoginForm({ clients }: { clients: Client[] }) {
       });
 
       if (!res.ok) {
-        toast("Something went wrong!");
+        return toast("Something went wrong!");
       }
 
-      router.push("/");
+      return router.push("/");
     } catch (error) {
-      toast("Something went wrong!");
+      return toast("Something went wrong!");
     }
   }
 
@@ -112,7 +112,7 @@ export default function LoginForm({ clients }: { clients: Client[] }) {
 
             <Button variant="link">Forgot password?</Button>
             <Button variant="link" asChild>
-              <Link href="/auth/register">Register</Link>
+              <Link href="/register">Register</Link>
             </Button>
           </form>
         </Form>

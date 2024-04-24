@@ -61,7 +61,7 @@ function RegisterForm({ clients }: { clients: Client[] }) {
     }
 
     toast("Account created!");
-    router.push("/auth/login");
+    router.push("/login");
   }
 
   return (
@@ -135,7 +135,7 @@ function RegisterForm({ clients }: { clients: Client[] }) {
 
             <Button variant="link">Forgot password?</Button>
             <Button variant="link" asChild>
-              <Link href="/auth/login">Login</Link>
+              <Link href="/login">Login</Link>
             </Button>
           </form>
         </Form>
