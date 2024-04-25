@@ -21,12 +21,6 @@ import { useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 
-// const registerClientFormSchema = z.object({
-//   username: z.string().min(2).max(50),
-//   name: z.string({}),
-//   description: z.string({}),
-// });
-
 const registerUserFormSchema = z.object({
   email: z.string().email(),
   username: z.string().min(4),

@@ -2,11 +2,14 @@ import prisma from "@/lib/db";
 
 export async function GET() {
   const clients = await prisma.client.findMany();
+  console.log(clients);
   return Response.json(clients);
 }
 
 export async function POST(req: Request) {
   const { name, description } = await req.json();
-  const result = await prisma.client.create({ data: { name, description } });
-  return Response.json(result);
+  return prisma.client
+    .create({ data: { name, description } })
+    .then(() => Response.json({ message: "Client created" }))
+    .catch((error) => Response.json(error, { status: 500 }));
 }

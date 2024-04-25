@@ -1,13 +1,17 @@
 import RegisterForm from "./components/register-form";
 
 async function getData() {
-  const res = await fetch(`${process.env.LOCAL_API_URL}/client`);
+  const res = await fetch(`${process.env.LOCAL_API_URL}/client`, {
+    cache: "no-store",
+  });
 
   if (!res.ok) {
     throw new Error("Failed to fetch data");
   }
 
-  return res.json();
+  const data = await res.json();
+
+  return data;
 }
 
 export default async function page() {

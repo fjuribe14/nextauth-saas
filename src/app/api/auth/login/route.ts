@@ -3,9 +3,9 @@ import prisma from "@/lib/db";
 export async function POST(req: Request) {
   const { client, email, password } = await req.json();
 
-  const clientExist = await prisma.client.findFirst({ where: { id: client } });
+  const clientFound = await prisma.client.findFirst({ where: { id: client } });
 
-  if (!clientExist) {
+  if (!clientFound) {
     return Response.json({ error: "Client not found" }, { status: 404 });
   }
 
@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     where: {
       email,
       password,
-      client: { id: clientExist.id },
+      client: { id: clientFound.id },
     },
   });
 
@@ -21,5 +21,5 @@ export async function POST(req: Request) {
     return Response.json({ error: "User not found" }, { status: 404 });
   }
 
-  return Response.json(userExist);
+  return Response.json({ message: "User logged in" });
 }

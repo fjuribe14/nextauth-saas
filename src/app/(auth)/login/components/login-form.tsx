@@ -39,20 +39,16 @@ export default function LoginForm({ clients }: { clients: Client[] }) {
   });
 
   async function onSubmit(values: z.infer<typeof loginUserFormSchema>) {
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        body: JSON.stringify(values),
-      });
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify(values),
+    });
 
-      if (!res.ok) {
-        return toast("Something went wrong!");
-      }
+    toast(JSON.stringify(await res.json(), null, 2));
 
-      return router.push("/");
-    } catch (error) {
-      return toast("Something went wrong!");
-    }
+    if (!res.ok) return;
+
+    return router.push("/");
   }
 
   return (
