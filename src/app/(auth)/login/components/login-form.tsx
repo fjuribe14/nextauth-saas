@@ -8,54 +8,50 @@ import {
   FormMessage,
   Form,
 } from "@/components/ui/form";
+
+import { z } from "zod";
+import Link from "next/link";
+import { toast } from "sonner";
+import { signIn } from "next-auth/react";
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { Client } from "@/interfaces/client";
 import { Input } from "@/components/ui/input";
+import { loginUserFormSchema } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@radix-ui/react-select";
 import TeamSwitcher from "@/components/team-switcher";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
-import { z } from "zod";
-import { Client } from "@/interfaces/client";
-import { toast } from "sonner";
-
-const loginUserFormSchema = z.object({
-  client: z.string(),
-  email: z.string().email(),
-  password: z.string().min(8).max(50),
-});
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 
 export default function LoginForm({ clients }: { clients: Client[] }) {
+  /** Hooks */
   const router = useRouter();
   const form = useForm<z.infer<typeof loginUserFormSchema>>({
     resolver: zodResolver(loginUserFormSchema),
-    defaultValues: {
-      client: "",
-      email: "",
-      password: "",
-    },
   });
 
+  /** Methods */
   async function onSubmit(values: z.infer<typeof loginUserFormSchema>) {
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      body: JSON.stringify(values),
+    const { client, email, password } = values;
+    const result = await signIn("credentials", {
+      client,
+      email,
+      password,
+      callbackUrl: "/",
+      redirect: false,
     });
 
-    toast(JSON.stringify(await res.json(), null, 2));
-
-    if (!res.ok) return;
-
-    return router.push("/");
+    result?.error && toast(JSON.stringify(result.error, null, 2), { icon: "💔" });
+    result?.ok && router.push(`${result?.url}`);
   }
 
+  /** Render */
   return (
     <Card className="lg:w-[60%]">
       <CardHeader>
-        <CardTitle>Create an account</CardTitle>
-        <CardDescription>join our team</CardDescription>
+        <CardTitle>Login</CardTitle>
+        <CardDescription>join with your team</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>

@@ -5,7 +5,7 @@ import { ModeToggle } from "../mode-toggle";
 import Link from "next/link";
 import Image from "next/image";
 
-export default function TopMenu() {
+export default async function TopMenu() {
   return (
     <div className="sticky top-0 z-40 hidden flex-col md:flex">
       <div className="border-b">

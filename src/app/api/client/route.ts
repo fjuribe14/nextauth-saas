@@ -2,7 +2,6 @@ import prisma from "@/lib/db";
 
 export async function GET() {
   const clients = await prisma.client.findMany();
-  console.log(clients);
   return Response.json(clients);
 }
 

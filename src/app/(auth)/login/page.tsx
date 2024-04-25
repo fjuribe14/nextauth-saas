@@ -1,7 +1,7 @@
 import LoginForm from "./components/login-form";
 
 async function getData() {
-  const res = await fetch(`${process.env.LOCAL_API_URL}/client`, {
+  const res = await fetch(`${process.env.NEXTAUTH_URL}/api/client`, {
     cache: "no-store",
   });
 
