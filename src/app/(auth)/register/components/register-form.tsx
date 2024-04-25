@@ -24,8 +24,9 @@ import Link from "next/link";
 const registerUserFormSchema = z.object({
   email: z.string().email(),
   username: z.string().min(4),
-  password: z.string().min(8).max(50),
   client: z.string(),
+  password: z.string().min(8).max(50),
+  password_confirmation: z.string().min(8).max(50),
 });
 
 function RegisterForm({ clients }: { clients: Client[] }) {
@@ -37,6 +38,7 @@ function RegisterForm({ clients }: { clients: Client[] }) {
       email: "",
       username: "",
       password: "",
+      password_confirmation: "",
     },
   });
 
@@ -110,6 +112,19 @@ function RegisterForm({ clients }: { clients: Client[] }) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input placeholder="********" {...field} type="password" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password_confirmation"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm your password</FormLabel>
                   <FormControl>
                     <Input placeholder="********" {...field} type="password" />
                   </FormControl>

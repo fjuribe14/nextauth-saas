@@ -2,7 +2,6 @@ import { Search } from "./search";
 import { MainNav } from "./main-nav";
 import { UserNav } from "./user-nav";
 import { ModeToggle } from "../mode-toggle";
-import CartBbutton from "./cart-button";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -21,9 +20,7 @@ export default function TopMenu() {
           <div className="w-full flex items-center gap-4">
             <div className="ms-auto"></div>
             <Search />
-
             <div className="me-auto"></div>
-            <CartBbutton />
             <ModeToggle />
             <UserNav />
           </div>
